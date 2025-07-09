@@ -1,14 +1,62 @@
+# pseudo_so/filas.py
+
 class GerenciadorFilas:
     def __init__(self):
-        self.fila_de_prontos = []
+        # Dicionário para manter filas separadas para cada nível de prioridade.
+        # Prioridade 0 é a mais alta.
+        self.filas_por_prioridade = {
+            0: [],  # Fila de Tempo Real (Maior Prioridade)
+            1: [],  # Fila de Usuário (Prioridade Média)
+            2: []   # Fila de Batch (Menor Prioridade)
+        }
 
     def adicionar_processo(self, processo):
-        self.fila_de_prontos.append(processo)
-        # Ordena a fila pelo tempo de inicialização para simular a chegada
-        self.fila_de_prontos.sort(key=lambda p: p.tempo_inicializacao)
+        """Adiciona um processo à fila correspondente à sua prioridade."""
+        prioridade = processo.prioridade
+        if prioridade in self.filas_por_prioridade:
+            self.filas_por_prioridade[prioridade].append(processo)
+        else:
+            # Caso um processo com prioridade inesperada apareça,
+            # ele é colocado na fila de menor prioridade.
+            print(f"AVISO: Processo {processo.pid} com prioridade inválida ({prioridade}). Alocado na fila de menor prioridade.")
+            self.filas_por_prioridade[max(self.filas_por_prioridade.keys())].append(processo)
 
     def proximo_processo(self):
-        """Retorna o próximo processo a ser executado."""
-        if self.fila_de_prontos:
-            return self.fila_de_prontos.pop(0)
-        return None
+        """
+        Retorna o próximo processo a ser executado, sempre buscando da fila
+        de maior prioridade para a de menor.
+        """
+        # Itera pelas filas em ordem de prioridade (0, 1, 2, ...)
+        for prioridade in sorted(self.filas_por_prioridade.keys()):
+            if self.filas_por_prioridade[prioridade]:
+                # Retorna e remove o primeiro processo da fila não vazia de maior prioridade
+                return self.filas_por_prioridade[prioridade].pop(0)
+        return None # Retorna None se todas as filas estiverem vazias
+
+    def envelhecer_processos(self):
+        """
+        Implementa a técnica de aging para evitar starvation.
+        Promove o processo mais antigo de uma fila de menor prioridade para uma mais alta.
+        """
+        # Começa a verificar da penúltima fila para cima
+        for prioridade in sorted(self.filas_por_prioridade.keys(), reverse=True)[:-1]:
+            fila_inferior_idx = prioridade
+            fila_superior_idx = prioridade - 1
+
+            if fila_superior_idx in self.filas_por_prioridade and self.filas_por_prioridade[fila_inferior_idx]:
+                # Pega o processo que está esperando há mais tempo (o primeiro da fila)
+                processo_a_promover = self.filas_por_prioridade[fila_inferior_idx].pop(0)
+                
+                # Diminui o valor da prioridade (ex: de 2 para 1) para promovê-lo
+                processo_a_promover.prioridade = fila_superior_idx
+                
+                # Adiciona à fila de prioridade mais alta
+                self.filas_por_prioridade[fila_superior_idx].append(processo_a_promover)
+                
+                print(f"AGING: Processo {processo_a_promover.pid} promovido para a prioridade {fila_superior_idx}.")
+                # Para o loop para promover apenas um processo por vez
+                return
+
+    def tem_processos(self):
+        """Verifica se ainda existe algum processo em qualquer uma das filas."""
+        return any(self.filas_por_prioridade.values())
