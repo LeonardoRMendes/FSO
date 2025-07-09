@@ -77,13 +77,20 @@ def main():
         # Se o processo não está na memória, tenta alocar
         if processo_atual.pid not in processos_na_memoria:
             offset = gerenciador_memoria.alocar(processo_atual)
-            if offset is not None:
+            recursos_ok = gerenciador_recursos.alocar(processo_atual)
+
+            if offset is not None and recursos_ok:
                 processos_na_memoria[processo_atual.pid] = processo_atual
                 print("dispatcher =>")
                 print(processo_atual)
             else:
-                # Falha na alocação, devolve para o início da fila para tentar de novo logo
-                print(f"Falha ao alocar memória para o processo {processo_atual.pid}. Reenfileirando.")
+                # Se falhar a alocação de memória ou recursos, desfaz qualquer coisa feita
+                if offset is not None:
+                    gerenciador_memoria.liberar(processo_atual)
+                if recursos_ok:
+                    gerenciador_recursos.liberar(processo_atual)
+
+                print(f"Falha ao alocar recursos/memória para o processo {processo_atual.pid}. Reenfileirando.")
                 gerenciador_filas.filas_por_prioridade[processo_atual.prioridade].insert(0, processo_atual)
                 ciclos_dispatcher += 1
                 continue
@@ -102,6 +109,7 @@ def main():
             # Se o processo terminou, libera seus recursos
             gerenciador_memoria.liberar(processo_atual)
             del processos_na_memoria[processo_atual.pid]
+            gerenciador_recursos.liberar(processo_atual)
             print("-" * 20)
         else:
             # Se não terminou, volta para o FIM da sua fila (Round-Robin)
