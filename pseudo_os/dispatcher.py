@@ -38,7 +38,7 @@ def main():
         print("Uso: python dispatcher.py <arquivo_processos> <arquivo_arquivos>")
         return
 
-    CICLOS_PARA_AGING = 5 # Ajustado para um número maior de ciclos
+    CICLOS_PARA_AGING = 5 
 
     # Inicialização dos Módulos
     gerenciador_memoria = GerenciadorMemoria()
@@ -121,7 +121,7 @@ def main():
 
         ciclos_dispatcher += 1
 
-    # Execução das Operações de Arquivo (lógica inalterada)
+    # Execução das Operações de Arquivo
     print("Sistema de arquivos =>")
     for i, op in enumerate(operacoes):
         pid_op = int(op[0])
