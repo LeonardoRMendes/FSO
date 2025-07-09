@@ -74,6 +74,16 @@ def main():
             ciclos_dispatcher += 1
             continue
 
+        # Antes de qualquer tentativa de alocação, verifica se o processo é viável.
+        if processo_atual.blocos_memoria > gerenciador_memoria.TAMANHO_TOTAL_MEMORIA:
+            print("dispatcher => ERRO CRÍTICO")
+            print(f"Processo {processo_atual.pid} solicita {processo_atual.blocos_memoria} blocos, mas o sistema só tem {gerenciador_memoria.TAMANHO_TOTAL_MEMORIA}.")
+            print("O processo será descartado.")
+            print("-" * 20)
+            # Pula para a próxima iteração do loop, efetivamente deletando o processo
+            # ao não reenfileirá-lo nem tentar alocá-lo.
+            continue
+
         # Se o processo não está na memória, tenta alocar
         if processo_atual.pid not in processos_na_memoria:
             offset = gerenciador_memoria.alocar(processo_atual)

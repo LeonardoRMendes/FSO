@@ -1,0 +1,17 @@
+# Arquivos de configuração e entrada específicos do ambiente local
+# Estes arquivos não devem ser versionados, pois cada desenvolvedor
+# pode ter sua própria versão para testes.
+processes.txt
+files.txt
+
+# Arquivos de bytecode e cache gerados pelo Python
+# Estes diretórios são gerados automaticamente durante a execução
+# e não fazem parte do código-fonte.
+__pycache__/
+
+# Arquivos de ambiente virtual (opcional, mas recomendado)
+# Se você criar um ambiente virtual chamado .venv na pasta do projeto
+.venv/
+
+# Arquivos de configuração do editor/IDE
+.vscode/
