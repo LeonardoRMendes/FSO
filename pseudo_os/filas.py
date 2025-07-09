@@ -1,5 +1,3 @@
-# pseudo_so/filas.py
-
 class GerenciadorFilas:
     def __init__(self):
         # Dicionário para manter filas separadas para cada nível de prioridade.
