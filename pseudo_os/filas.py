@@ -19,17 +19,15 @@ class GerenciadorFilas:
             print(f"AVISO: Processo {processo.pid} com prioridade inválida ({prioridade}). Alocado na fila de menor prioridade.")
             self.filas_por_prioridade[max(self.filas_por_prioridade.keys())].append(processo)
 
+    def reenfileirar_processo(self, processo):
+        """Adiciona um processo de volta ao FIM da sua fila de prioridade."""
+        self.filas_por_prioridade[processo.prioridade].append(processo)
+
     def proximo_processo(self):
-        """
-        Retorna o próximo processo a ser executado, sempre buscando da fila
-        de maior prioridade para a de menor.
-        """
-        # Itera pelas filas em ordem de prioridade (0, 1, 2, ...)
         for prioridade in sorted(self.filas_por_prioridade.keys()):
             if self.filas_por_prioridade[prioridade]:
-                # Retorna e remove o primeiro processo da fila não vazia de maior prioridade
                 return self.filas_por_prioridade[prioridade].pop(0)
-        return None # Retorna None se todas as filas estiverem vazias
+        return None
 
     def envelhecer_processos(self):
         """
