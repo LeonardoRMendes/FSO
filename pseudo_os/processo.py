@@ -6,8 +6,8 @@ class Processo:
         self.tempo_processador = int(tempo_processador)
         self.blocos_memoria = int(blocos_memoria)
         self.impressora_req = int(impressora_req)
-        self.scanner_req = bool(int(scanner_req))
-        self.modem_req = bool(int(modem_req))
+        self.scanner_req = int(scanner_req)
+        self.modem_req = int(modem_req)
         self.disco_req = int(disco_req)
         
         self.estado = 'novo' # Estados possíveis: novo, pronto, executando, bloqueado, terminado
